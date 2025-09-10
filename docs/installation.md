@@ -1,6 +1,31 @@
 # Installation Guide
 
-## Prerequisites
+## Quick Test (2 Minutes)
+
+Want to see if these functions are worth your time? Here's the fastest way to try them:
+
+### Minimal Setup
+```bash
+# 1. Install Nushell (if not already installed)
+brew install nushell  # macOS
+# or: apt install nushell  # Linux
+
+# 2. Download one function to test
+curl -o fcit https://raw.githubusercontent.com/your-username/nushell-knowledge-tools/main/functions/fcit.nu
+chmod +x fcit
+
+# 3. Set basic config (use any markdown directory)
+export OBSIDIAN_VAULT="/path/to/your/notes"
+
+# 4. Test it
+nu fcit
+```
+
+If you see immediate value, continue with full installation below.
+
+## Full Installation
+
+### Prerequisites
 
 ### Required Tools
 
@@ -123,20 +148,37 @@ $env.EDITOR = "hx"  # or "nvim", "vim", "code", etc.
 
 ## Verification
 
-Test the installation:
+Test the installation with your preferred workflow:
 
+### Test Individual Functions
 ```bash
-# Test basic file search
+# Universal file search (works anywhere)
 fsh
 
-# Test citation picker (requires OBSIDIAN_VAULT)
+# Citation management (requires vault setup)
 fcit
 
-# Test wiki links (requires OBSIDIAN_VAULT)
+# Wiki link creation (requires vault setup)  
 fwl
 
-# Test content search (requires OBSIDIAN_VAULT)
+# Content discovery (requires vault setup)
 fsearch
+
+# AI semantic search (requires OpenAI API key)
+fsem
+```
+
+### Test Tool Choice Independence
+```bash
+# Same functions work with any editor
+EDITOR=nvim fsh    # Opens in Neovim
+EDITOR=code fsh    # Opens in VS Code  
+EDITOR=vim fsh     # Opens in Vim
+
+# Same functions work with any terminal
+# - Try in iTerm2, Alacritty, GNOME Terminal
+# - Try over SSH connection
+# - Try in tmux or Zellij session
 ```
 
 ## Troubleshooting
