@@ -1,0 +1,38 @@
+# Nushell
+*.nu~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files  
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# API keys and sensitive data
+.env
+.env.local
+config.yaml
+credentials.json
+
+# Cache directories
+.cache/
+node_modules/
+target/
+
+# Personal vault paths (should be configured by user)
+vault_path.txt
