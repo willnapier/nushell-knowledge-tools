@@ -104,6 +104,52 @@ $ fsh
 - **Cross-platform**: Automatic OS detection and adaptation
 - **SSH-friendly**: Full functionality over remote connections
 
+## Optimal Workflow Integration
+
+### **Two Ways to Use These Functions**
+
+#### **Standalone Mode** (Works Anywhere)
+```bash
+# Stop current work → run function → return to work
+$ fcit
+📋 Copied: @smith2024automation
+$ # paste into current document
+```
+
+#### **Integrated Workflow Mode** (Optimal Experience)
+```
+┌─ Main Writing/Work Pane ──────┐  ┌─ Tool Pane ─────┐
+│ Writing morning pages about   │  │ nu> fcit         │
+│ productivity concepts...      │  │ 📋 Copied        │
+│                               │  │ nu> fwl          │
+│ [[Habit Formation]] ideas     │  │ 📋 Copied        │
+│ from @smith2024automation     │  │ nu> fsearch      │
+│                               │  │ 📋 Copied        │
+└───────────────────────────────┘  └──────────────────┘
+```
+
+### **Why Integrated Mode Flows Better**
+
+**The workflow "flow" comes from:**
+- **Parallel processing**: Functions run alongside main work, not interrupting it
+- **Context preservation**: Stay in your document while tools operate
+- **Instant availability**: Spare Nushell prompt ready when inspiration strikes
+- **Seamless integration**: Paste results without losing focus or mental state
+
+### **Recommended Stack for Optimal Experience**
+
+**For the best integrated workflow:**
+- **Terminal**: [WezTerm](https://wezfurlong.org/wezterm/) (GPU-accelerated, reliable rendering)
+- **Multiplexer**: [Zellij](https://zellij.dev) (floating panes, easy workspace management)
+- **Shell**: [Nushell](https://nushell.sh) (obviously required)
+- **Editor**: Your choice - [Helix](https://helix-editor.com), Neovim, VS Code, etc.
+
+**Minimum requirements:**
+- **Shell**: Nushell (required for functions)
+- **Context**: Any terminal/multiplexer combination (functions still work)
+
+**The difference**: Standalone mode provides the functionality. Integrated mode provides the *workflow*.
+
 ## The Nushell Advantage
 
 These functions demonstrate why structured data matters:
