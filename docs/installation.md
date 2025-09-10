@@ -4,7 +4,7 @@
 
 ### Required Tools
 
-1. **Nushell** - The shell these functions are built for
+1. **Nushell** - The foundation for structured data processing in knowledge work
    ```bash
    # macOS
    brew install nushell
@@ -62,8 +62,8 @@
 ### Method 1: Clone and Install
 
 ```bash
-git clone https://github.com/your-username/academic-workflow-tools.git
-cd academic-workflow-tools/functions
+git clone https://github.com/your-username/nushell-knowledge-tools.git
+cd nushell-knowledge-tools/functions
 nu install.nu
 ```
 
@@ -85,7 +85,7 @@ nu install.nu
 
 ```bash
 # Download specific functions you want
-curl -o ~/.local/bin/fcit https://raw.githubusercontent.com/your-username/academic-workflow-tools/main/functions/fcit.nu
+curl -o ~/.local/bin/fcit https://raw.githubusercontent.com/your-username/nushell-knowledge-tools/main/functions/fcit.nu
 chmod +x ~/.local/bin/fcit
 ```
 
@@ -105,9 +105,10 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ## Environment Variables
 
-### Required for Citation Functions
+### Required for Knowledge Functions
 ```nushell
-$env.OBSIDIAN_VAULT = "/path/to/your/obsidian/vault"
+# Your knowledge vault (Obsidian, Foam, or plain markdown directory)
+$env.OBSIDIAN_VAULT = "/path/to/your/notes"
 ```
 
 ### Required for Semantic Search
