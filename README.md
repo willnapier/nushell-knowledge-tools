@@ -4,7 +4,7 @@
 
 For developers and power users who've outgrown Obsidian, Notion, and other GUI-heavy tools. These terminal-native functions let you craft a personalized knowledge system using the tools you already love - with the reliability of structured data processing and the speed of CLI workflows.
 
-**Ready Yay Ready** to take control of your knowledge tools.
+Ready to take control of your knowledge tools?
 
 ## Universal Compatibility
 
