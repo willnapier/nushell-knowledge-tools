@@ -16,11 +16,12 @@ Ready to take control of your knowledge tools?
 
 ## What You Get
 
-📚 **Citation Management**: Interactive picker with clipboard integration  
-📝 **Note Linking**: Wiki-style connections between ideas  
-🔍 **Content Discovery**: Fast search across your knowledge base  
-🧠 **AI Discovery**: Semantic search using OpenAI embeddings (optional)  
-📁 **File Operations**: Universal file search with editor integration  
+📚 **Citation Management**: Interactive picker with clipboard integration
+📝 **Note Linking**: Wiki-style connections between ideas
+🔍 **Content Discovery**: Fast search across your knowledge base
+🧠 **AI Discovery**: Semantic search using OpenAI embeddings (optional)
+📁 **File Operations**: Universal file search with editor integration
+⏱️ **Time Tracking**: Automatic duration calculation for activity entries  
 
 ## Quick Test (2 minutes)
 
@@ -48,6 +49,7 @@ If you see immediate value, continue with full installation below.
 
 ### ⚡ **Zero Setup Required**
 - **`fsh`** - Universal file search (works anywhere)
+- **`fdur`** - Activity duration processing (works anywhere with Nushell)
 
 ### 📁 **Basic Setup** (5 minutes)
 - **`fwl`** - Wiki link creator (needs `OBSIDIAN_VAULT` set to any markdown directory)
@@ -109,6 +111,42 @@ $ fsh
 [Interactive file picker with previews]
 🚀 Opening morning-pages.md in your preferred editor...
 ```
+
+### ⏱️ `fdur` - Activity Duration Processing
+Automatically calculates and inserts durations for time-based activity entries
+```bash
+$ fdur ~/notes/today.md
+🔄 Processing activity durations in /Users/me/notes/today.md
+✅ Activity durations processed in /Users/me/notes/today.md
+
+# Before:
+t:: meeting with client 0930-1015
+s:: deep work session 1400-1630
+
+# After:
+t:: meeting with client 45min 0930-1015
+s:: deep work session 2hr 30min 1400-1630
+```
+
+#### **Dual Approach Example**
+
+**Specific file processing:**
+```bash
+fdur ~/notes/today.md  # Process specific file
+```
+
+**Bulk processing:**
+```bash
+cd ~/notes && fdur     # Process all activity files in directory
+```
+
+**SSH and cross-platform examples:**
+```bash
+ssh user@server "cd ~/notes && fdur"           # Remote processing
+fdur /mnt/synced-notes/activities/daily.md     # Cross-platform paths
+```
+
+Perfect example of dual approach philosophy: works both as targeted file processor and bulk directory processor.
 
 ## Why This Approach Works
 
