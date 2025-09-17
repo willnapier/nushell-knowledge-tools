@@ -160,13 +160,19 @@ Use VS Code's integrated terminal with universal functions:
 
 ## Requirements
 
-### Modern Rust Tools
-These integrations use modern Rust-based tools for superior performance:
+### Modern Rust Tools + Nushell
+These integrations use modern tools for superior performance and structured data processing:
 
+**Rust Tools**:
 - **`rg` (ripgrep)**: Replaces `grep` - faster and more reliable text processing
 - **`sd`**: Replaces `sed` - safer string replacement with better regex support
 - **`fd`**: Replaces `find` - much faster file discovery
 - **`sk` (skim)**: Modern fuzzy finder for interactive selection
+
+**Nushell Benefits**:
+- **Native `ps`**: No need for `ps aux` - use `ps | where name =~ "pattern"`
+- **Structured data**: Process info as tables instead of text parsing
+- **Built-in filtering**: `where`, `select`, `length` instead of `grep | wc -l`
 
 **Installation**: Most systems won't have these by default. When users encounter "command not found" errors, they can choose to install the modern toolchain:
 
@@ -180,6 +186,31 @@ cargo install sd
 
 # Arch Linux
 sudo pacman -S ripgrep sd fd skim
+
+# Nushell installation
+brew install nushell  # macOS
+sudo apt install nushell  # Ubuntu/Debian (recent versions)
+cargo install nu  # Cross-platform via Rust
+```
+
+### Nushell vs Unix Commands
+
+**Process Monitoring**:
+```bash
+# Traditional Unix (problematic - flags vary across systems)
+ps aux | grep zellij | grep -v grep | wc -l
+
+# Native Nushell (consistent, structured)
+ps | where name =~ "zellij" | length
+```
+
+**Data Processing**:
+```bash
+# Traditional Unix (text-based, fragile)
+ps aux | grep pattern | awk '{print $2, $11}' | sort
+
+# Native Nushell (structured, reliable)
+ps | where name =~ "pattern" | select pid name | sort-by name
 ```
 
 ## Design Principles
