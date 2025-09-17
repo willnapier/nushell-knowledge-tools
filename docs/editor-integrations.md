@@ -51,7 +51,7 @@ if [ -f /tmp/helix-cursor-col.txt ]; then
 fi
 
 # Extract all wiki links with their positions
-links_with_positions=$(echo "$line" | grep -b -o -E '!?\[\[[^]]+\]\]' 2>/dev/null || echo "")
+links_with_positions=$(echo "$line" | rg -o --byte-offset '!?\[\[[^]]+\]\]' 2>/dev/null || echo "")
 
 # If no links found, exit
 if [ -z "$links_with_positions" ]; then
@@ -156,6 +156,30 @@ Use VS Code's integrated terminal with universal functions:
     }
   ]
 }
+```
+
+## Requirements
+
+### Modern Rust Tools
+These integrations use modern Rust-based tools for superior performance:
+
+- **`rg` (ripgrep)**: Replaces `grep` - faster and more reliable text processing
+- **`sd`**: Replaces `sed` - safer string replacement with better regex support
+- **`fd`**: Replaces `find` - much faster file discovery
+- **`sk` (skim)**: Modern fuzzy finder for interactive selection
+
+**Installation**: Most systems won't have these by default. When users encounter "command not found" errors, they can choose to install the modern toolchain:
+
+```bash
+# macOS
+brew install ripgrep sd fd skim
+
+# Linux (Ubuntu/Debian)
+sudo apt install ripgrep fd-find skim
+cargo install sd
+
+# Arch Linux
+sudo pacman -S ripgrep sd fd skim
 ```
 
 ## Design Principles
