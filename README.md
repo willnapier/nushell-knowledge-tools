@@ -307,9 +307,10 @@ Total: ~3 seconds, zero mental overhead
 
 ## Documentation
 
-- **[Installation Guide](docs/installation.md)** - Cross-platform setup with quick test  
+- **[Installation Guide](docs/installation.md)** - Cross-platform setup with quick test
 - **[Obsidian Migration Guide](docs/obsidian-migration.md)** - Escape GUI bloat, keep what works
 - **[Citation Setup Guide](docs/citation-setup.md)** - Complete Zotero + BibTeX workflow
+- **[Editor Integrations](docs/editor-integrations.md)** - **NEW**: Cursor-aware wiki links & enhanced capabilities
 - **[Configuration Reference](docs/configuration.md)** - Environment setup options
 - **[Workflow Examples](examples/)** - Real-world usage patterns
 - **[Rust Ecosystem Guide](docs/rust-ecosystem.md)** - Why modern terminal tools matter
