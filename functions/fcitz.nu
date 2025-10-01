@@ -1,144 +1,87 @@
-#!/usr/bin/env nu
-# File citation + open PDF in Zotero - Cross-platform PDF access from BibTeX library
-# Searches library.bib for citations and opens corresponding PDFs
+# fcitz - Universal PDF Finder & Opener
+# Part of nushell-knowledge-tools
+# https://github.com/willnapier/nushell-knowledge-tools
 
-def main [] {
-    print "🔍 Loading Zotero library..."
-    let library_file = $"($env.OBSIDIAN_VAULT?)/ZET/library.bib"
+# File citation + open PDF in Zotero (uses citations.md)
+# Updated 2025-10-01: Uses citations.md for consistency, opens PDFs directly
+export def main [] {
+    print "🔍 Loading citations..."
+    let citations_file = $"($env.FORGE?)/ZET/citations.md"
+    let library_file = $"($env.FORGE?)/ZET/library.bib"
+
+    if not ($citations_file | path exists) {
+        print $"❌ Citations file not found: ($citations_file)"
+        return
+    }
+
     if not ($library_file | path exists) {
         print $"❌ Library file not found: ($library_file)"
         return
     }
-    
-    print "📚 Extracting citations from BibTeX library..."
-    # Simple approach: extract keys, then get metadata for each
-    let entries = (
-        rg '@\w+\{([^,]+),' $library_file -o --replace '$1' --no-line-number
-        | lines
-        | uniq
-        | each { |key|
-            # Get the full entry for this key
-            let entry_text = (rg -A 20 $"@\\w+\\{($key)," $library_file | str join ' ')
-            
-            # Extract title
-            let title = (
-                $entry_text 
-                | parse --regex 'title\s*=\s*\{([^}]+(?:\{\{[^}]+\}\}[^}]+)*)\}' 
-                | get -o 0.capture0? 
-                | default ""
-                | str replace --all '{{' '' 
-                | str replace --all '}}' ''
-            )
-            
-            # Extract file path
-            let file_path = (
-                $entry_text 
-                | parse --regex 'file\s*=\s*\{([^}]+)\}' 
-                | get -o 0.capture0? 
-                | default ""
-            )
-            
-            # Extract author
-            let author = (
-                $entry_text 
-                | parse --regex 'author\s*=\s*\{([^}]+)\}' 
-                | get -o 0.capture0? 
-                | default ""
-                | split row ' and ' 
-                | get -o 0? 
-                | default ""
-                | split row ',' 
-                | get -o 0? 
-                | default ""
-            )
-            
-            # Extract year  
-            let year = (
-                $entry_text 
-                | parse --regex 'year\s*=\s*\{(\d+)\}' 
-                | get -o 0.capture0? 
-                | default ""
-            )
-            
-            # Create display string
-            let display = if ($title | is-empty) {
-                $key
-            } else if (not ($author | is-empty)) and (not ($year | is-empty)) {
-                $"($key) | ($author) (($year)) - ($title)"
-            } else if not ($year | is-empty) {
-                $"($key) | (($year)) - ($title)"
-            } else {
-                $"($key) | ($title)"
-            }
-            
-            {key: $key, title: $title, file: $file_path, display: $display}
-        }
-    )
-    
-    if ($entries | is-empty) {
-        print "❌ No citations found in library.bib"
+
+    # Load citations (same as fcit for consistency)
+    let citations = (open $citations_file | lines | where $it != "" | where ($it | str starts-with "#") == false | where ($it | str trim) != "")
+    if ($citations | is-empty) {
+        print "❌ No citations found"
         return
     }
-    
-    print $"📖 Found (($entries | length)) entries"
-    
-    # Create selection list
-    let selected = (
-        $entries 
-        | get display 
-        | str join "\n" 
-        | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk 
-            --preview 'echo {}' 
-            --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' 
-            --prompt "📚 Citation → PDF: " 
-        | str trim
-    )
-    
+
+    # Select citation
+    let selected = ($citations | str join "\n" | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk --preview 'echo {}' --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' --prompt "📚 Citation → PDF: " | str trim)
+
     if not ($selected | is-empty) {
-        # Find the matching entry
-        let entry = ($entries | where { |it| $it.display == $selected } | get -o 0?)
-        
-        if ($entry | is-empty) {
-            print "❌ Could not find entry data"
+        # Extract clean key and Zotero key from format: "CleanKey [ZoteroKey] Title"
+        let clean_key = ($selected | split row ' ' | first)
+        let zotero_key = ($selected | parse --regex '\[([^\]]+)\]' | get -o 0.capture0? | default "")
+
+        if ($zotero_key | is-empty) {
+            print "❌ Could not extract Zotero key from citation"
             return
         }
-        
-        print $"📄 Opening: ($entry.key)"
-        
-        # Try to open the PDF file directly if available
-        if (not ($entry.file | is-empty)) and ($entry.file | path exists) {
-            print $"📂 Opening PDF: ($entry.file | path basename)"
-            
-            # Cross-platform file opening
-            let open_cmd = if $nu.os-info.name == "macos" {
-                "open"
-            } else if $nu.os-info.name == "linux" {
-                "xdg-open"
+
+        print $"📄 Selected: ($clean_key) → ($zotero_key)"
+
+        # Find PDF path in library.bib
+        let entry_text = (rg -A 20 $"@\\w+\\{($zotero_key)," $library_file | str join ' ')
+        let file_path = ($entry_text | parse --regex 'file\s*=\s*\{([^}]+)\}' | get -o 0.capture0? | default "")
+
+        if not ($file_path | is-empty) and ($file_path | path exists) {
+            print $"📂 Opening PDF: ($file_path)"
+            # Use system open command to open in default PDF viewer
+            if (sys host | get name) == "Darwin" {
+                ^open $file_path
             } else {
-                "start"  # Windows
+                ^xdg-open $file_path
             }
-            ^$open_cmd $entry.file
-            print "✅ PDF opened directly"
         } else {
-            # Fallback to Zotero select URL to highlight the item
-            print "🔍 Opening in Zotero library (PDF not found locally)..."
-            
-            # Use the select URL scheme which works better than search
-            # This will select the item in Zotero, then user can double-click to open PDF
-            let zotero_url = $"zotero://select/items/@($entry.key)"
-            
-            # Cross-platform URL opening
-            let open_cmd = if $nu.os-info.name == "macos" {
-                "open"
-            } else if $nu.os-info.name == "linux" {
-                "xdg-open"
+            print $"⚠️  PDF file not found at: ($file_path)"
+            print $"🔗 Opening Zotero instead..."
+            if (sys host | get name) == "Darwin" {
+                ^open $"zotero://select/items/@($zotero_key)"
             } else {
-                "start"  # Windows
+                ^xdg-open $"zotero://select/items/@($zotero_key)"
             }
-            ^$open_cmd $zotero_url
-            
-            print "💡 Item selected in Zotero - double-click to open its PDF"
-            print $"💡 If not found, try searching for: ($entry.title)"
         }
     }
 }
+
+# USAGE:
+# fcitz                   # Open citation picker and open PDF
+#
+# REQUIREMENTS:
+# - sk (skim) fuzzy finder
+# - citations.md file at $FORGE/ZET/citations.md
+# - library.bib file at $FORGE/ZET/library.bib
+# - Zotero installed (optional, for fallback)
+#
+# WORKFLOW:
+# 1. Search for citation by title, author, or keywords
+# 2. Select entry
+# 3. PDF opens directly in system viewer (Preview on macOS)
+# 4. Fallback to Zotero if PDF path not found
+#
+# Updated 2025-10-01:
+# - Now uses citations.md (same as fcit) for consistency
+# - Extracts Zotero key from [brackets] for PDF lookup
+# - Opens PDFs directly instead of dumping binary data
+# - Cross-platform support (macOS + Linux)
