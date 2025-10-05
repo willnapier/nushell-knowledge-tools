@@ -4,14 +4,20 @@
 
 ### Core Configuration
 
-#### OBSIDIAN_VAULT (Required)
-Path to your Obsidian vault directory.
+#### OBSIDIAN_VAULT or FORGE_VAULT (Required)
+Path to your markdown knowledge vault directory. Use either variable name - they work identically.
 
 ```nushell
+# Option 1: Generic name (works with any markdown directory)
 $env.OBSIDIAN_VAULT = "/Users/username/Documents/MyVault"
+
+# Option 2: Forge-specific name (for Forge vault users)
+$env.FORGE_VAULT = "/Users/username/Forge"
 ```
 
-**Used by**: `fcit`, `fcitz`, `fwl`, `fsearch`
+**Used by**: `fcit`, `fcitz`, `fwl`, `fsearch`, `activity-duration-processor`
+
+**Priority**: Functions check `FORGE_VAULT` first, then fall back to `OBSIDIAN_VAULT`
 
 #### EDITOR (Recommended)
 Your preferred text editor for file operations.
@@ -40,12 +46,14 @@ $env.OPENAI_API_KEY = "sk-..."
 
 ## File Structure Requirements
 
-### Obsidian Vault Structure
+### Vault Structure
+
+Works with any markdown directory structure. For academic features, optionally include:
 
 ```
 your-vault/
 ├── ZET/
-│   ├── citations.md      # Citation database
+│   ├── citations.md      # Citation database (for fcit)
 │   └── library.bib       # BibTeX library (for fcitz)
 └── ...
 ```

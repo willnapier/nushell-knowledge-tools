@@ -10,7 +10,16 @@
 def main [file_path?: string] {
     let target_file = if ($file_path | is-empty) {
         # If no file specified, find recently modified .md files
-        let files = (glob $"($env.HOME)/Obsidian.nosync/Forge/**/*.md")
+        # Use FORGE_VAULT if set, fallback to OBSIDIAN_VAULT, then to default location
+        let vault_path = if not ($env.FORGE_VAULT? | is-empty) {
+            $env.FORGE_VAULT
+        } else if not ($env.OBSIDIAN_VAULT? | is-empty) {
+            $env.OBSIDIAN_VAULT
+        } else {
+            $"($env.HOME)/Forge"
+        }
+
+        let files = (glob $"($vault_path)/**/*.md")
         
         if ($files | length) == 0 {
             print "No markdown files found in vault"

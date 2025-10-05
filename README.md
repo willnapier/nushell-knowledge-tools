@@ -40,6 +40,7 @@ chmod +x fcit
 
 # 3. Set up basic config
 export OBSIDIAN_VAULT="/path/to/your/notes"  # or any markdown directory
+# Alternative: export FORGE_VAULT="/path/to/your/notes"
 
 # 4. Experience the difference
 nu fcit
