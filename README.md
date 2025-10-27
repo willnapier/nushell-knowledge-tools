@@ -539,12 +539,29 @@ Total: ~3 seconds, zero mental overhead
 - **GUI tools**: Limited to provided plugins and themes
 - **These functions**: Modify, extend, and compose however you need
 
+## Editor Integration
+
+### Integration Options
+
+These universal functions work with any editor. Choose your approach:
+
+1. **Manual Integration** - Follow the [editor integration patterns](docs/editor-integrations.md)
+2. **Complete Helix Setup** - Use **[helix-knowledge-integration](https://github.com/willnapier/helix-knowledge-integration)** (ready to clone and use!)
+3. **Build Your Own** - Create an integration for your editor (PRs welcome to list here!)
+
+### Complete Integrations
+
+- **Helix**: **[helix-knowledge-integration](https://github.com/willnapier/helix-knowledge-integration)** - Complete configuration with cursor-aware wiki navigation, keybindings, and scripts
+- **Neovim**: [Your integration here! Open a PR]
+- **VS Code**: [Your integration here! Open a PR]
+- **Emacs**: [Your integration here! Open a PR]
+
 ## Documentation
 
 - **[Installation Guide](docs/installation.md)** - Cross-platform setup with quick test
 - **[Obsidian Migration Guide](docs/obsidian-migration.md)** - Escape GUI bloat, keep what works
 - **[Citation Setup Guide](docs/citation-setup.md)** - Complete Zotero + BibTeX workflow
-- **[Editor Integrations](docs/editor-integrations.md)** - **NEW**: Cursor-aware wiki links & enhanced capabilities
+- **[Editor Integrations](docs/editor-integrations.md)** - Universal integration patterns with Helix reference
 - **[Configuration Reference](docs/configuration.md)** - Environment setup options
 - **[Workflow Examples](examples/)** - Real-world usage patterns
 - **[Rust Ecosystem Guide](docs/rust-ecosystem.md)** - Why modern terminal tools matter
