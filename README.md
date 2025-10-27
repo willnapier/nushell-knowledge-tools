@@ -177,6 +177,92 @@ fdur /mnt/synced-notes/activities/daily.md     # Cross-platform paths
 
 Perfect example of dual approach philosophy: works both as targeted file processor and bulk directory processor.
 
+## Automatic Link Management (NEW 2025-10-27) 🔗
+
+**Event-driven wiki link management following Unix philosophy**
+
+### Three Composable Tools
+
+**🔗 `wiki-backlinks`** - Automatic bidirectional backlink maintenance
+- Watches markdown files for `[[wiki links]]`
+- Automatically updates `## Backlinks` sections
+- Works across multiple directories
+- Zero manual effort
+
+**🔍 `wiki-resolve-mark`** - Visual unresolved link markers  
+- Marks broken links: `[[link]]` → `?[[link]]`
+- Cleans when files created: `?[[link]]` → `[[link]]`
+- Smart filtering (excludes URLs, UUIDs, system paths)
+- Instant feedback on note completeness
+
+**⚙️ `link-service`** - Unified service management
+- Start/stop/status for all watchers
+- Multi-directory × multi-feature spawning
+- Centralized logs and monitoring
+- Simple operational model
+
+### Quick Start
+
+```bash
+# Copy scripts to PATH
+cp functions/wiki-backlinks ~/.local/bin/
+cp functions/wiki-resolve-mark ~/.local/bin/
+cp functions/link-service ~/.local/bin/
+chmod +x ~/.local/bin/wiki-* ~/.local/bin/link-service
+
+# Create log directory
+mkdir -p ~/scripts/wiki-link-management/logs
+
+# Configure directories (edit scripts)
+# Set your note directories in both wiki-backlinks and wiki-resolve-mark
+
+# Start service
+link-service start
+
+# Check status
+link-service status
+```
+
+### Unix Philosophy Design
+
+**Why split into three tools instead of one?**
+
+- **Composable**: Run just backlinks, just resolve-mark, or both
+- **Customizable**: Enable features independently
+- **Zero overhead**: Event-driven means no redundancy
+- **Clear responsibilities**: Each tool does one thing well
+
+**Example Architecture** (2 directories × 2 features = 4 watchers):
+```
+Forge:
+  - wiki-backlinks (PID 12345)
+  - wiki-resolve-mark (PID 12346)
+
+Admin:
+  - wiki-backlinks (PID 12347)
+  - wiki-resolve-mark (PID 12348)
+```
+
+### Performance
+
+- **CPU**: 0% when idle (kernel-based events)
+- **Memory**: ~24MB per watcher (~96MB for 4 watchers)
+- **Scalability**: Tested with 6,400+ markdown files
+- **Multi-directory**: True bidirectional updates across directories
+
+### Complete Documentation
+
+📖 **See [Wiki Link Management Guide](docs/wiki-link-management.md)** for:
+- Detailed architecture explanation
+- Event-driven design principles
+- Configuration options
+- Troubleshooting guide
+- Migration from unified to split
+- Customization examples
+
+---
+
+
 ## Why This Approach Works
 
 ### Traditional Knowledge Tools Problems:
