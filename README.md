@@ -3,6 +3,23 @@
 > **2025-10-27 UPDATE**: v2.0 editor-neutral architecture with complete function set! 🎯
 > **2025-09-17**: Complete migration to Rust tools + Nushell architecture achieved! 🦀
 
+## Repository Scope
+
+**What This Repository Provides:**
+- ✅ **13 universal CLI functions** - Work with any editor, any terminal, any platform
+- ✅ **Integration patterns** - How to connect these tools to your workflow
+- ✅ **Helix reference implementation** - ONE complete example (not prescriptive)
+- ✅ **Adaptation guidance** - Pointers for other editors
+
+**What This Repository Does NOT Provide:**
+- ❌ Complete configurations for every editor
+- ❌ Detailed Neovim/Vim/VS Code/Emacs implementations
+- ❌ Editor-specific feature development
+
+**Your Role**: Adapt the universal tools and patterns to your preferred editor and workflow.
+
+---
+
 For developers and power users who've outgrown Obsidian, Notion, and other GUI-heavy tools. These terminal-native functions let you craft a personalized knowledge system using the tools you already love - with the reliability of structured data processing and the speed of CLI workflows.
 
 **NEW**: Complete elimination of legacy Unix dependencies - now using modern Rust tools (`rg`, `sd`, `fd`, `sk`) with native Nushell structured data processing for maximum performance and cross-platform reliability.
