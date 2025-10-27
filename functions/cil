@@ -1,0 +1,43 @@
+#!/usr/bin/env nu
+# cil - CItation → Literature note Link
+# Citation picker that copies wiki link to literature note
+# Part of nushell-knowledge-tools v2.0
+
+export def main [] {
+    print "🔍 Loading citations..."
+    let citations_file = $"($env.FORGE?)/ZET/citations.md"
+    if not ($citations_file | path exists) {
+        print $"❌ Citations file not found: ($citations_file)"
+        return
+    }
+
+    let citations = (open $citations_file | lines | where $it != "" | where ($it | str starts-with "#") == false | where ($it | str trim) != "")
+    if ($citations | is-empty) {
+        print "❌ No citations found"
+        return
+    }
+
+    let selected = ($citations | str join "\n" | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk --preview 'echo {}' --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' --prompt "📚 Citation → Lit Note: " | str trim)
+    if not ($selected | is-empty) {
+        # Extract clean key (first word before space)
+        # Format: "Zamoyski2009 [zoteroKey] Title" → "Zamoyski2009"
+        let clean_key = ($selected | split row ' ' | first)
+        let wikilink = $"[[($clean_key)]]"
+
+        # Cross-platform clipboard
+        if (sys host | get name) == "Darwin" {
+            $wikilink | pbcopy
+        } else if (which wl-copy | is-not-empty) {
+            $wikilink | wl-copy
+        } else if (which xclip | is-not-empty) {
+            $wikilink | xclip -selection clipboard
+        } else {
+            print $"⚠️  No clipboard tool found. Link: ($wikilink)"
+            return
+        }
+
+        print $"📋 Copied to clipboard: ($wikilink)"
+        print "💡 Paste anywhere with Cmd+V (macOS) or Ctrl+V (Linux)"
+        print $"📝 Links to literature note: ($clean_key).md"
+    }
+}

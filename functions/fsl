@@ -1,0 +1,32 @@
+#!/usr/bin/env nu
+# fsl - Forge file Search → Link
+# Universal knowledge navigation with wiki link clipboard copy
+# Part of nushell-knowledge-tools v2.0
+
+def main [] {
+    if not ($env.FORGE? | is-empty) and ($env.FORGE | path exists) {
+        let file = (fd . $env.FORGE --type f --extension md | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk --preview 'bat --color=always {}' --preview-window 'right:60%' --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' --prompt "📝 Wiki Link: " | str trim)
+        if not ($file | is-empty) {
+            let filename = ($file | path basename | str replace ".md" "")
+            let wikilink = $"[[($filename)]]"
+
+            # Cross-platform clipboard
+            if (sys host | get name) == "Darwin" {
+                $wikilink | pbcopy
+            } else if (which wl-copy | is-not-empty) {
+                $wikilink | wl-copy
+            } else if (which xclip | is-not-empty) {
+                $wikilink | xclip -selection clipboard
+            } else {
+                print $"⚠️  No clipboard tool found. Link: ($wikilink)"
+                return
+            }
+
+            print $"📋 Copied to clipboard: ($wikilink)"
+            print "💡 Paste anywhere with Cmd+V (macOS) or Ctrl+V (Linux)"
+        }
+    } else {
+        print "❌ FORGE not set or doesn't exist"
+        print "💡 Set with: $env.FORGE = '/path/to/your/knowledge-base'"
+    }
+}

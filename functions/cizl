@@ -1,0 +1,63 @@
+#!/usr/bin/env nu
+# cizl - CItation Zotero → Link
+# Citation picker that copies markdown link with Zotero protocol
+# Part of nushell-knowledge-tools v2.0
+
+export def main [] {
+    print "🔍 Loading citations..."
+    let citations_file = $"($env.FORGE?)/ZET/citations.md"
+    let library_file = $"($env.FORGE?)/ZET/library.bib"
+
+    if not ($citations_file | path exists) {
+        print $"❌ Citations file not found: ($citations_file)"
+        return
+    }
+
+    if not ($library_file | path exists) {
+        print $"❌ Library file not found: ($library_file)"
+        return
+    }
+
+    # Load citations
+    let citations = (open $citations_file | lines | where $it != "" | where ($it | str starts-with "#") == false | where ($it | str trim) != "")
+    if ($citations | is-empty) {
+        print "❌ No citations found"
+        return
+    }
+
+    # Select citation
+    let selected = ($citations | str join "\n" | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk --preview 'echo {}' --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' --prompt "📚 Citation → Zotero Link: " | str trim)
+
+    if not ($selected | is-empty) {
+        # Extract clean key and Zotero key from format: "CleanKey [ZoteroKey] Title"
+        let clean_key = ($selected | split row ' ' | first)
+        let zotero_key = ($selected | parse --regex '\[([^\]]+)\]' | get -o 0.capture0? | default "")
+
+        # Extract title (everything after the [ZoteroKey])
+        let title = ($selected | parse --regex '\]\s*(.+)$' | get -o 0.capture0? | default $clean_key)
+
+        if ($zotero_key | is-empty) {
+            print "❌ Could not extract Zotero key from citation"
+            return
+        }
+
+        # Create markdown link with Zotero protocol
+        let zotero_link = $"[($title)](zotero://select/items/@($zotero_key))"
+
+        # Cross-platform clipboard
+        if (sys host | get name) == "Darwin" {
+            $zotero_link | pbcopy
+        } else if (which wl-copy | is-not-empty) {
+            $zotero_link | wl-copy
+        } else if (which xclip | is-not-empty) {
+            $zotero_link | xclip -selection clipboard
+        } else {
+            print $"⚠️  No clipboard tool found. Link: ($zotero_link)"
+            return
+        }
+
+        print $"📋 Copied to clipboard: ($zotero_link)"
+        print "💡 Paste anywhere with Cmd+V (macOS) or Ctrl+V (Linux)"
+        print $"🔗 Clicking link will open Zotero and select: ($clean_key)"
+    }
+}

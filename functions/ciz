@@ -1,9 +1,7 @@
-# fcitz - Universal PDF Finder & Opener
-# Part of nushell-knowledge-tools
-# https://github.com/willnapier/nushell-knowledge-tools
-
-# File citation + open PDF in Zotero (uses citations.md)
-# Updated 2025-10-01: Uses citations.md for consistency, opens PDFs directly
+#!/usr/bin/env nu
+# ciz - CItation → Zotero/PDF
+# Universal citation picker with PDF opening
+# Part of nushell-knowledge-tools v2.0
 export def main [] {
     print "🔍 Loading citations..."
     let citations_file = $"($env.FORGE?)/ZET/citations.md"

@@ -1,10 +1,8 @@
-# fcit - Universal Citation Picker
-# Part of nushell-knowledge-tools
-# https://github.com/willnapier/nushell-knowledge-tools
-
+#!/usr/bin/env nu
+# cit - CITation plain text
 # Universal citation picker - search and copy citation keys
+# Part of nushell-knowledge-tools v2.0
 # Works with academic research workflow (Zotero + BibTeX integration)
-# Updated 2025-10-01: Clean output format without internal Zotero keys
 export def main [] {
     print "🔍 Loading citations..."
     let citations_file = $"($env.FORGE?)/ZET/citations.md"

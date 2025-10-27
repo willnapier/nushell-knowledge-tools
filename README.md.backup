@@ -1,7 +1,6 @@
-# Universal Knowledge Functions v2.0
+# Universal Knowledge Functions
 
-> **2025-10-27 UPDATE**: v2.0 editor-neutral architecture with complete function set! 🎯
-> **2025-09-17**: Complete migration to Rust tools + Nushell architecture achieved! 🦀
+> **2025-09-17 UPDATE**: Complete migration to Rust tools + Nushell architecture achieved! 🦀
 
 For developers and power users who've outgrown Obsidian, Notion, and other GUI-heavy tools. These terminal-native functions let you craft a personalized knowledge system using the tools you already love - with the reliability of structured data processing and the speed of CLI workflows.
 
@@ -24,52 +23,7 @@ Ready to take control of your knowledge tools?
 🔍 **Content Discovery**: Fast search across your knowledge base
 🧠 **AI Discovery**: Semantic search using OpenAI embeddings (optional)
 📁 **File Operations**: Universal file search with editor integration
-⏱️ **Time Tracking**: Automatic duration calculation for activity entries
-
-## 🎯 v2.0 Naming Convention (October 2025)
-
-**Universal Tool Architecture** with editor-neutral, platform-agnostic design.
-
-### Naming Pattern: `[scope][search-type][output]`
-
-**Scope Prefixes:**
-- `f` = **Forge** (knowledge base at `$env.FORGE`)
-- `g` = **Global** (current directory/any location)
-- `c` = **Citations** (academic literature workflow)
-
-**Search Types:**
-- `s` = **file Search** (by filename)
-- `c` = **Content search** (by file contents)
-- `sm` = **SeMantic search** (AI-powered relevance)
-
-**Output Destinations:**
-- `l` = **Link** (copies `[[wikilink]]` to clipboard)
-- `e` = **Editor** (opens in `$env.EDITOR`, fallback to `vi`)
-- `o` = **Open** (platform-aware: `open` on macOS, `xdg-open` on Linux)
-- `z` = **Zotero** (opens PDF or Zotero protocol)
-
-### Complete Function Set
-
-**Forge Functions** (knowledge base):
-- `fse` - Forge Search → Editor
-- `fsl` - Forge Search → Link
-- `fce` - Forge Content → Editor
-- `fcl` - Forge Content → Link
-- `fsme` - Forge SeMantic → Editor
-- `fsml` - Forge SeMantic → Link
-
-**Global Functions** (any directory):
-- `gso` - Global Search → Open
-- `gco` - Global Content → Open
-
-**Citation Functions** (academic workflow):
-- `cit` - CITation plain text
-- `cil` - CItation → Literature note Link
-- `ciz` - CItation → Zotero/PDF
-- `cizl` - CItation Zotero → markdown Link
-
-**Utility Tools:**
-- `fdur` - Activity duration processing
+⏱️ **Time Tracking**: Automatic duration calculation for activity entries  
 
 ## Quick Test (2 minutes)
 
@@ -81,15 +35,15 @@ brew install nushell  # macOS
 # or: apt install nushell  # Linux
 
 # 2. Try one function
-curl -o cit https://raw.githubusercontent.com/your-username/nushell-knowledge-tools/main/functions/cit
-chmod +x cit
+curl -o fcit https://raw.githubusercontent.com/your-username/nushell-knowledge-tools/main/functions/fcit.nu
+chmod +x fcit
 
 # 3. Set up basic config
-export FORGE="/path/to/your/notes"  # or any markdown directory
+export OBSIDIAN_VAULT="/path/to/your/notes"  # or any markdown directory
 # Alternative: export FORGE_VAULT="/path/to/your/notes"
 
 # 4. Experience the difference
-nu cit
+nu fcit
 ```
 
 If you see immediate value, continue with full installation below.
@@ -123,66 +77,66 @@ rg "t:: (\d+)-(\d+)" file.md | each { |match| calculate_duration $match }
 ## Function Requirements by Complexity
 
 ### ⚡ **Zero Setup Required**
-- **`gso`** - Universal file search (works anywhere)
+- **`fsh`** - Universal file search (works anywhere)
 - **`fdur`** - Activity duration processing (works anywhere with Nushell)
 
 ### 📁 **Basic Setup** (5 minutes)
-- **`fsl`** - Wiki link creator (needs `FORGE` set to any markdown directory)
-- **`fcl`** - Content discovery (needs `FORGE` set to any markdown directory)
+- **`fwl`** - Wiki link creator (needs `OBSIDIAN_VAULT` set to any markdown directory)
+- **`fsearch`** - Content discovery (needs `OBSIDIAN_VAULT` set to any markdown directory)
 
 ### 📚 **Citation Workflow Setup** (30-60 minutes)
-- **`cit`** - Citation picker (requires Zotero + BibTeX export + citation curation)
-- **`citz`** - Citation + PDF opener (requires Zotero + BibTeX + PDF file paths)
+- **`fcit`** - Citation picker (requires Zotero + BibTeX export + citation curation)
+- **`fcitz`** - Citation + PDF opener (requires Zotero + BibTeX + PDF file paths)
 
 *See [Citation Setup Guide](docs/citation-setup.md) for detailed instructions*
 
 ### 🧠 **AI-Enhanced Setup** (requires API key)
-- **`fsml`** - Semantic search (requires OpenAI API key + semantic indexer)
+- **`fsem`** - Semantic search (requires OpenAI API key + semantic indexer)
 
 ## Core Functions
 
-### 📚 `cit` - Citation Picker
+### 📚 `fcit` - Citation Picker
 Interactive citation selector with clipboard copy
 ```bash
-$ cit
+$ fcit
 🔍 Loading citations...
 📚 Found 447 citations
 [Interactive picker with fuzzy search]
 📋 Copied to clipboard: @smith2024automation
 ```
 
-### 📝 `fsl` - Wiki Link Creator  
+### 📝 `fwl` - Wiki Link Creator  
 Connect ideas across your knowledge base
 ```bash
-$ fsl
+$ fwl
 📝 Loading vault notes...
 [Search with preview across all notes]
 📋 Copied to clipboard: [[Personal Productivity Framework]]
 ```
 
-### 🔍 `fcl` - Content Discovery
+### 🔍 `fsearch` - Content Discovery
 Find content across all your notes
 ```bash
-$ fcl
+$ fsearch
 🔍 Search content: habit formation
 [Results with context preview]
 📋 Copied to clipboard: [[Identity-Based Habits]]
 ```
 
-### 🧠 `fsml` - AI Concept Discovery
+### 🧠 `fsem` - AI Concept Discovery
 Semantic search using AI embeddings (requires OpenAI API)
 ```bash
-$ fsml
+$ fsem
 🧠 Semantic search in your vault...
 🔍 Search concept: workflow automation
 [AI-ranked results by conceptual similarity]
 📋 Copied to clipboard: [[Process Optimization Theory]]
 ```
 
-### 📁 `gso` - Universal File Search
+### 📁 `fsh` - Universal File Search
 Cross-platform file search with editor integration
 ```bash
-$ gso
+$ fsh
 [Interactive file picker with previews]
 🚀 Opening morning-pages.md in your preferred editor...
 ```
@@ -330,7 +284,7 @@ Admin:
 #### **Standalone Mode** (Works Anywhere)
 ```bash
 # Stop current work → run function → return to work
-$ cit
+$ fcit
 📋 Copied: @smith2024automation
 $ # paste into current document
 ```
@@ -338,11 +292,11 @@ $ # paste into current document
 #### **Integrated Workflow Mode** (Optimal Experience)
 ```
 ┌─ Main Writing/Work Pane ──────┐  ┌─ Tool Pane ─────┐
-│ Writing morning pages about   │  │ nu> cit         │
+│ Writing morning pages about   │  │ nu> fcit         │
 │ productivity concepts...      │  │ 📋 Copied        │
-│                               │  │ nu> fsl          │
+│                               │  │ nu> fwl          │
 │ [[Habit Formation]] ideas     │  │ 📋 Copied        │
-│ from @smith2024automation     │  │ nu> fcl      │
+│ from @smith2024automation     │  │ nu> fsearch      │
 │                               │  │ 📋 Copied        │
 └───────────────────────────────┘  └──────────────────┘
 ```
@@ -416,13 +370,13 @@ apt install nushell ripgrep sd fd-find skim
 ```bash
 git clone https://github.com/your-username/nushell-knowledge-tools.git
 cd nushell-knowledge-tools/functions
-nu install
+nu install.nu
 ```
 
 ### Configuration
 ```bash
 # Required: Set your knowledge vault path
-$env.FORGE = "/path/to/your/notes"  # Obsidian, Foam, or any markdown directory
+$env.OBSIDIAN_VAULT = "/path/to/your/notes"  # Obsidian, Foam, or any markdown directory
 
 # Optional: For AI semantic search
 $env.OPENAI_API_KEY = "your-api-key"
@@ -446,9 +400,9 @@ $env.OPENAI_API_KEY = "your-api-key"
 
 | Operation | Obsidian | These Functions | Improvement |
 |-----------|----------|----------------|-------------|
-| **Citation lookup** | 15-30 seconds (GUI navigation) | 3-5 seconds (`cit`) | **6-10x faster** |
-| **Content search** | 5-10 seconds (index + UI) | 1-2 seconds (`fcl`) | **5x faster** |
-| **Link creation** | 10-15 seconds (typing + autocomplete) | 2-3 seconds (`fsl`) | **5x faster** |
+| **Citation lookup** | 15-30 seconds (GUI navigation) | 3-5 seconds (`fcit`) | **6-10x faster** |
+| **Content search** | 5-10 seconds (index + UI) | 1-2 seconds (`fsearch`) | **5x faster** |
+| **Link creation** | 10-15 seconds (typing + autocomplete) | 2-3 seconds (`fwl`) | **5x faster** |
 | **Memory usage** | 200-400MB (Electron app) | 10-20MB (terminal functions) | **20x more efficient** |
 | **Startup time** | 3-8 seconds (app launch) | Instant (already in terminal) | **∞x faster** |
 
@@ -474,7 +428,7 @@ Total: ~27 seconds + context switching overhead
 
 **After: Terminal-Native Flow**
 ```
-1. 🚀 Run cit in spare terminal pane (instant)
+1. 🚀 Run fcit in spare terminal pane (instant)
 2. ⌨️  Type 2-3 characters to filter (1 second)
 3. ↵️  Select result (1 second) 
 4. 📝 Paste and continue writing (no context switch)

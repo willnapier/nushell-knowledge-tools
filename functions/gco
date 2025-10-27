@@ -1,0 +1,36 @@
+#!/usr/bin/env nu
+# gco - Global Content search → Open
+# Universal content discovery with system-appropriate opening
+# Part of nushell-knowledge-tools v2.0
+
+def main [] {
+    let query = (input "🔍 Search content: ")
+    if ($query | is-empty) {
+        return
+    }
+
+    print $"🔍 Searching for: ($query)"
+    let results = try {
+        ^rg -i -l $query . | lines | where $it != ""
+    } catch {
+        print "❌ Content search failed. Install ripgrep: brew install ripgrep"
+        return
+    }
+
+    if ($results | is-empty) {
+        print "❌ No matches found"
+        return
+    }
+
+    let selected = ($results | str join "\n" | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk --preview $"rg --color=always -i -C 3 '($query)' {}" --preview-window 'right:60%' --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' --prompt "📄 Content: " | str trim)
+    if not ($selected | is-empty) {
+        print $"🚀 Opening ($selected | path basename) with system default..."
+
+        # Use platform-appropriate open command
+        if (sys host | get name) == "Darwin" {
+            ^open $selected
+        } else {
+            ^xdg-open $selected
+        }
+    }
+}

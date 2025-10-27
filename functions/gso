@@ -1,0 +1,25 @@
+#!/usr/bin/env nu
+# gso - Global file Search → Open
+# Universal file discovery with system-appropriate opening
+# Part of nushell-knowledge-tools v2.0
+
+def main [] {
+    if (which fd | is-empty) or (which sk | is-empty) {
+        print "❌ Required tools missing."
+        print "💡 Install with: brew install fd sk  # macOS"
+        print "💡 Or: apt install fd-find skim  # Linux"
+        return
+    }
+
+    let file = (fd . --type f --hidden --exclude .git | ^env TERM=xterm-256color TERMINFO="" TERMINFO_DIRS="" sk --preview 'bat --color=always {}' --preview-window 'right:60%' --bind 'up:up,down:down,ctrl-j:down,ctrl-k:up' --prompt "📁 File Search: " | str trim)
+    if not ($file | is-empty) {
+        print $"🚀 Opening ($file) with system default..."
+
+        # Use platform-appropriate open command
+        if (sys host | get name) == "Darwin" {
+            ^open $file
+        } else {
+            ^xdg-open $file
+        }
+    }
+}
