@@ -33,7 +33,8 @@ Ready to take control of your knowledge tools?
 ### Naming Pattern: `[scope][search-type][output]`
 
 **Scope Prefixes:**
-- `f` = **Forge** (knowledge base at `$env.FORGE`)
+- `f` = **Knowledge base** (your personal vault at `$env.FORGE`)
+  - *Note: "Forge" is just one example - use any name you prefer (VAULT, NOTES, KNOWLEDGE_BASE, etc.)*
 - `g` = **Global** (current directory/any location)
 - `c` = **Citations** (academic literature workflow)
 
@@ -50,13 +51,13 @@ Ready to take control of your knowledge tools?
 
 ### Complete Function Set
 
-**Forge Functions** (knowledge base):
-- `fse` - Forge Search → Editor
-- `fsl` - Forge Search → Link
-- `fce` - Forge Content → Editor
-- `fcl` - Forge Content → Link
-- `fsme` - Forge SeMantic → Editor
-- `fsml` - Forge SeMantic → Link
+**Knowledge Base Functions** (`f` prefix - uses `$env.FORGE`):
+- `fse` - File Search → Editor
+- `fsl` - File Search → Link
+- `fce` - Content → Editor
+- `fcl` - Content → Link
+- `fsme` - Semantic → Editor
+- `fsml` - Semantic → Link
 
 **Global Functions** (any directory):
 - `gso` - Global Search → Open
@@ -127,8 +128,9 @@ rg "t:: (\d+)-(\d+)" file.md | each { |match| calculate_duration $match }
 - **`fdur`** - Activity duration processing (works anywhere with Nushell)
 
 ### 📁 **Basic Setup** (5 minutes)
-- **`fsl`** - Wiki link creator (needs `FORGE` set to any markdown directory)
-- **`fcl`** - Content discovery (needs `FORGE` set to any markdown directory)
+- **`fsl`** - Wiki link creator (needs `$env.FORGE` set to your vault directory)
+- **`fcl`** - Content discovery (needs `$env.FORGE` set to your vault directory)
+- *Note: `FORGE` is customizable - use `VAULT`, `NOTES`, or any name you prefer*
 
 ### 📚 **Citation Workflow Setup** (30-60 minutes)
 - **`cit`** - Citation picker (requires Zotero + BibTeX export + citation curation)
@@ -420,13 +422,44 @@ nu install
 ```
 
 ### Configuration
-```bash
-# Required: Set your knowledge vault path
-$env.FORGE = "/path/to/your/notes"  # Obsidian, Foam, or any markdown directory
 
-# Optional: For AI semantic search
+**Knowledge Base Path** (required for `f*` functions):
+```bash
+# Option 1: Use FORGE (the convention used in this repo)
+$env.FORGE = "/path/to/your/notes"
+
+# Option 2: Use your own name (VAULT, NOTES, KNOWLEDGE_BASE, etc.)
+$env.VAULT = "/path/to/your/notes"
+$env.NOTES = "/path/to/your/notes"
+$env.KNOWLEDGE_BASE = "/path/to/your/notes"
+
+# The functions check for FORGE, but you can easily customize them
+# to use your preferred variable name
+```
+
+**Editor Configuration** (optional - uses `vi` as fallback):
+```bash
+$env.EDITOR = "hx"      # Helix
+$env.EDITOR = "nvim"    # Neovim
+$env.EDITOR = "vim"     # Vim
+$env.EDITOR = "emacs"   # Emacs
+$env.EDITOR = "code --wait"  # VS Code
+```
+
+**AI Semantic Search** (optional):
+```bash
 $env.OPENAI_API_KEY = "your-api-key"
 ```
+
+**Customizing the Variable Name:**
+
+If you prefer a different environment variable name than `FORGE`, you can:
+1. Fork the repository
+2. Search and replace `$env.FORGE` with your preferred name
+3. Or create aliases in your Nushell config:
+   ```nushell
+   $env.FORGE = $env.VAULT  # Redirect FORGE to your VAULT
+   ```
 
 ## Target Audience
 
