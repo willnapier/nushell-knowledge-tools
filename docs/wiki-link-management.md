@@ -624,6 +624,24 @@ wiki-resolve-mark &
 
 ---
 
+## ⚠️ Critical Safety Guidelines
+
+**MANDATORY READING**: [File Watcher Safety Guidelines](./file-watcher-safety.md)
+
+File watchers that modify watched files require **mandatory debouncing** to prevent runaway loops. A critical incident in October 2025 resulted in data corruption of 16 files when debounce protection was missing during a Python-to-Nushell migration.
+
+**Key Safety Requirements**:
+- ✅ Debouncing enabled with minimum 2000ms delay (already implemented)
+- ✅ Integration testing before deployment (watch → modify → re-trigger cycle)
+- ✅ Regular backups before script changes
+- ✅ Corruption monitoring for early detection
+
+**Current Status**: ✅ Both `wiki-backlinks` and `wiki-resolve-mark` include proper debouncing. All incidents have been resolved with complete recovery.
+
+See [file-watcher-safety.md](./file-watcher-safety.md) for complete safety protocols, testing methodology, and recovery procedures.
+
+---
+
 ## Troubleshooting
 
 ### Watchers Not Starting
