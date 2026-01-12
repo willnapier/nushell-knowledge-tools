@@ -47,7 +47,7 @@ link-service         → Manages both (or either) as needed
 **Usage**:
 ```bash
 # Standalone usage
-wiki-backlinks [--debounce-ms 2000]
+wiki-backlinks [--debounce 2000]
 
 # Managed via service
 link-service start  # Starts backlinks + resolve-mark
@@ -83,7 +83,7 @@ link-service start  # Starts backlinks + resolve-mark
 **Usage**:
 ```bash
 # Standalone usage
-wiki-resolve-mark [--debounce-ms 2000]
+wiki-resolve-mark [--debounce 2000]
 
 # Managed via service
 link-service start  # Starts backlinks + resolve-mark
@@ -681,7 +681,7 @@ cat ~/scripts/wiki-link-management/logs/resolve-Forge.err.log
 1. **Too many file changes**: Large batch operations triggering many events
 2. **Debounce too low**: Increase debounce delay
    ```bash
-   wiki-backlinks --debounce-ms 5000  # 5 seconds instead of 2
+   wiki-backlinks --debounce 5000  # 5 seconds instead of 2
    ```
 
 3. **Large files**: Processing very large markdown files
@@ -924,6 +924,26 @@ Split:      Two receivers tuned to same broadcast
 ---
 
 ## Changelog
+
+### 2026-01-12 - Critical Bug Fixes and Safety Guards
+
+**Fixed**:
+- **Regex escape bug**: Changed `\\[` to `\[` in ripgrep patterns - Nushell string escaping was causing pattern matching to fail silently
+- **Double-marking bug**: `?[[link]]` was becoming `???[[link]]` due to `str replace -a` matching substrings. Fixed using placeholder technique to protect existing markers
+- **File corruption bug**: Added safety guards to `ensure_backlinks_section` - validates content length before and after modification
+
+**Added**:
+- **File size filter**: Skip files >500KB (likely garbage web clips, not real notes)
+- **Link count filter**: Skip files with >100 links (likely garbage content)
+- **Content validation**: Refuse to write if output is less than half of input length
+
+**Cross-Platform**:
+- **Nushell version differences**: The `watch` command flag differs between versions:
+  - Older Nushell (macOS): `--debounce` (milliseconds as integer)
+  - Newer Nushell (Linux): `--debounce` (duration type like `2sec`)
+- Scripts now use `--debounce` with duration type - users on older Nushell may need to modify
+
+**Safety Protocol**: See [file-watcher-safety.md](./file-watcher-safety.md) for complete guidelines.
 
 ### 2025-10-27 - Split Architecture Implementation
 

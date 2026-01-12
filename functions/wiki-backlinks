@@ -8,9 +8,11 @@
 # - Cross-directory support (Forge, Admin, Archives)
 # - Event-driven (zero CPU when idle)
 #
-# Usage: wiki-backlinks [--debounce-ms 2000]
+# Note: ~/Assistants is excluded - it contains Claude documentation, not knowledge base files
+#
+# Usage: wiki-backlinks [--debounce 2000]
 
-def main [--debounce-ms: int = 2000] {
+def main [--debounce: duration = 2sec] {
     # Verify required directories exist
     let forge = $"($env.HOME)/Forge"
     let admin = $"($env.HOME)/Admin"
@@ -30,29 +32,23 @@ def main [--debounce-ms: int = 2000] {
     print ""
 
     # Create watched paths list (immutable for closure capture)
-    let watch_paths = if ($admin | path exists) and ($archives | path exists) {
-        [$forge, $admin, $archives]
-    } else if ($admin | path exists) {
-        [$forge, $admin]
-    } else if ($archives | path exists) {
-        [$forge, $archives]
-    } else {
-        [$forge]
-    }
+    # Include all directories that exist (excluding ~/Assistants - Claude docs, not knowledge base)
+    let watch_paths = ([$forge, $admin, $archives] | where {|p| $p | path exists})
 
     print $"📂 Watching ($watch_paths | length) directories for markdown files"
-    print $"⏱️  Debounce: ($debounce_ms)ms"
+    print $"⏱️  Debounce: ($debounce)"
     print ""
 
     # Watch Forge directory (primary)
     print $"🔍 Monitoring Forge for file events..."
-    watch $forge --glob "**/*.md" --debounce-ms $debounce_ms {|operation, file_path, new_path|
+    watch $forge --glob "**/*.md" --debounce $debounce {|operation, file_path, new_path|
         handle_change $operation $file_path $new_path $watch_paths
     }
 }
 
 # Handle file change events
-def handle_change [operation: string, file_path: string, new_path: string, watch_paths: list] {
+# Note: new_path is only populated for Rename operations, otherwise null
+def handle_change [operation: string, file_path: string, new_path, watch_paths: list] {
     match $operation {
         "Write" => {
             # File was edited - update backlinks for linked files
@@ -64,7 +60,10 @@ def handle_change [operation: string, file_path: string, new_path: string, watch
         }
         "Rename" => {
             # File renamed - update all references
-            handle_rename $file_path $new_path $watch_paths
+            # new_path should always be populated for Rename, but guard against null
+            if ($new_path | is-not-empty) {
+                handle_rename $file_path ($new_path | into string) $watch_paths
+            }
         }
         "Remove" => {
             # File deleted - no action needed for backlinks
@@ -81,9 +80,16 @@ def handle_create [file_path: string, watch_paths: list] {
     let file_name = ($file_path | path basename | str replace '.md' '')
     print $"✨ Created: ($file_name)"
 
+    # Skip large files (>500KB) - these are likely garbage web clips, not real notes
+    let file_size = try { (ls $file_path | first | get size) } catch { 0b }
+    if $file_size > 500kb {
+        print $"   ⚠️  Skipping large file (($file_size)) - likely garbage web clip"
+        return
+    }
+
     # Check if new file contains any links
     let links = try {
-        open $file_path | rg -o '[!?]?\\[\\[([^\\]]+)\\]\\]' --replace '$1' | lines | uniq
+        open $file_path | rg -o '[!?]?\[\[([^\]]+)\]\]' --replace '$1' | lines | uniq
     } catch {
         []
     }
@@ -104,15 +110,28 @@ def handle_create [file_path: string, watch_paths: list] {
 def handle_write [file_path: string, watch_paths: list] {
     print $"📝 Modified: ($file_path | path basename)"
 
+    # Skip large files (>500KB) - these are likely garbage web clips, not real notes
+    let file_size = try { (ls $file_path | first | get size) } catch { 0b }
+    if $file_size > 500kb {
+        print $"   ⚠️  Skipping large file (($file_size)) - likely garbage web clip"
+        return
+    }
+
     # Extract current links from file
     let current_links = try {
-        open $file_path | rg -o '[!?]?\\[\\[([^\\]]+)\\]\\]' --replace '$1' | lines | uniq
+        open $file_path | rg -o '[!?]?\[\[([^\]]+)\]\]' --replace '$1' | lines | uniq
     } catch {
         []
     }
 
     if ($current_links | is-empty) {
         print "   No wiki links in file, skipping"
+        return
+    }
+
+    # Skip files with excessive links (>100) - likely garbage web clips
+    if ($current_links | length) > 100 {
+        print $"   ⚠️  Skipping file with ($current_links | length) links - likely garbage"
         return
     }
 
@@ -145,7 +164,7 @@ def handle_rename [old_path: string, new_path: string, watch_paths: list] {
     mut affected_files = []
     for dir in $existing_paths {
         let files = try {
-            ^rg -l $'\\[\\[($old_name)\\]\\]' $dir --glob "*.md" | lines
+            ^rg -l $'\[\[($old_name)\]\]' $dir --glob "*.md" | lines
         } catch {
             []
         }
@@ -215,7 +234,7 @@ def update_backlinks [file_path: string, watch_paths: list] {
     mut backlinks = []
     for dir in $existing_paths {
         let links = try {
-            ^rg -l $'\\[\\[($file_name)\\]\\]' $dir --glob "*.md" | lines | where $it != $file_path
+            ^rg -l $'\[\[($file_name)\]\]' $dir --glob "*.md" | lines | where $it != $file_path
         } catch {
             []
         }
@@ -249,23 +268,51 @@ def ensure_backlinks_section [file_path: string, backlinks: list] {
         return
     }
 
+    # Safety check: don't corrupt files - if content is empty or very short, skip
+    if ($content | str length) < 10 {
+        print $"      ⚠️  Skipping empty/minimal file: ($file_path | path basename)"
+        return
+    }
+
     # Check if file has ## Backlinks section
     if ($content | str contains "## Backlinks") {
-        # Replace existing backlinks section
-        let before = ($content | str replace -r '## Backlinks\n.*' '' | str trim)
+        # Replace existing backlinks section - split on ## Backlinks and take content before it
+        # BUG FIX: Previous regex '## Backlinks\n.*' only matched one line because . doesn't match newlines
+        let lines = ($content | lines)
+        let matches = ($lines | enumerate | where {|x| $x.item =~ "^## Backlinks"})
+        if ($matches | is-empty) {
+            print $"      ⚠️  Backlinks section detection failed for: ($file_path | path basename)"
+            return
+        }
+        let backlinks_idx = ($matches | first | get index)
+        # Safety: if backlinks section is at line 0 or 1, something is wrong
+        if $backlinks_idx < 2 {
+            print $"      ⚠️  Backlinks section too early in file: ($file_path | path basename)"
+            return
+        }
+        let before = ($lines | first $backlinks_idx | str join "\n" | str trim)
         let backlinks_section = if ($backlinks | is-empty) {
-            "\n\n## Backlinks\n\n"
+            "\n\n## Backlinks\n"
         } else {
-            $"\n\n## Backlinks\n\n($backlinks | str join '\n')\n"
+            # Use (char newline) not '\n' - the latter is a literal string in Nushell
+            let joined = ($backlinks | str join (char newline))
+            $"\n\n## Backlinks\n\n($joined)\n"
         }
         let updated = $"($before)($backlinks_section)"
+        # Safety check before writing
+        if ($updated | str length) < ($content | str length) / 2 {
+            print $"      ⚠️  Refusing to write potentially corrupted content to: ($file_path | path basename)"
+            return
+        }
         $updated | save -f $file_path
     } else {
         # Add backlinks section at end
         let backlinks_section = if ($backlinks | is-empty) {
-            "\n\n## Backlinks\n\n"
+            "\n\n## Backlinks\n"
         } else {
-            $"\n\n## Backlinks\n\n($backlinks | str join '\n')\n"
+            # Use (char newline) not '\n' - the latter is a literal string in Nushell
+            let joined = ($backlinks | str join (char newline))
+            $"\n\n## Backlinks\n\n($joined)\n"
         }
         $"($content)($backlinks_section)" | save -f $file_path
     }
