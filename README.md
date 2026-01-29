@@ -583,6 +583,14 @@ These universal functions work with any editor. Choose your approach:
 ### Is It Worth It?
 If you value **reliable automation over familiar tooling**, absolutely. These functions demonstrate what's possible when you choose tools designed for structured data processing.
 
+## Related Repositories
+
+| Repository | Description |
+|------------|-------------|
+| [helix-knowledge-integration](https://github.com/willnapier/helix-knowledge-integration) | Helix editor integration for these universal functions |
+| [continuum](https://github.com/willnapier/continuum) | Cross-platform AI conversation logging (uses the same Nushell + Rust toolchain) |
+| [dotfiles](https://github.com/willnapier/dotfiles) | Full system configuration including file watchers and Rust CLI tools |
+
 ## Contributing
 
 Contributions welcome for:
